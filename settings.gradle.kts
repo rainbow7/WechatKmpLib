@@ -1,3 +1,4 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
     repositories {
         google()
@@ -13,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "WechatLib"
-include(":Wechat")
+rootProject.name = "WechatKMPLib"
+include(":shared")
