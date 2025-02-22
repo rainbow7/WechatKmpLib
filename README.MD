@@ -24,6 +24,14 @@
 Kotlin版本要求：1.9.x
 
 ## 怎么配置？
+在项目的setting gradle 文件中增加gitpack
+
+```kts
+repositories {
+    ...
+    maven { url = uri("https://jitpack.io") }
+}
+```
 
 在:shared模块下的build.gradle.kts增加如下配置
 
@@ -35,7 +43,7 @@ kotlin {
         //添加微信官方sdk配置，只需要linkOnly就行，因为这个库本身已经集成了
         pod("WechatOpenSDK-XCFramework" ) {
             linkOnly = true
-            version = "2.0.2" //保持版本号和WechatLib集成的SDK版本一致
+            version = "2.0.4" //保持版本号和WechatLib集成的SDK版本一致
         }
     }
     
@@ -43,7 +51,7 @@ kotlin {
         val commonMain by getting {
             ...
             //集成
-            implementation("icu.bughub.kit:Wechat:0.0.1")
+            implementation("com.github.rainbow7:WechatKMPLib:0.0.1")
         }
     }
 }
