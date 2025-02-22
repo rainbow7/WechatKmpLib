@@ -1,21 +1,19 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    kotlin("multiplatform")
-    kotlin("native.cocoapods")
-    id("com.android.library")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.androidLibrary)
     id("maven-publish")
 }
 
-group = "icu.bughub.kit"
-version = "0.0.1"
-
-@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
-
-    android {
+    androidTarget {
         compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_1_8)
+                }
             }
         }
     }
@@ -27,62 +25,61 @@ kotlin {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
         version = "1.0"
-        ios.deploymentTarget = "11.0"
+        ios.deploymentTarget = "16.0"
         framework {
-            baseName = "Wechat"
+            baseName = "wechat"
+            isStatic = true
         }
 
-        //配置微信open sdk，固定版本
-        pod("WechatOpenSDK-XCFramework"){
-            version = "2.0.2"
+        pod("WechatOpenSDK-XCFramework") {
+            version = "2.0.4"
+            headers = "WXApi.h"
         }
 
-        //处理微信SDK没有module问题
-        //参考文档：https://kotlinlang.org/docs/native-cocoapods.html#module-not-found
-        tasks.named<org.jetbrains.kotlin.gradle.tasks.DefFileTask>("generateDefWechatOpenSDK_XCFramework")
-            .configure {
-                doLast {
-                    outputFile.writeText(
-                        """
-                language = Objective-C
-                headers = WXApi.h
-            """.trimIndent()
-                    )
-                }
-            }
     }
-    
+
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                //put your multiplatform dependencies here
-            }
+        commonMain.dependencies {
+            //put your multiplatform dependencies here
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
+        androidMain.dependencies {
+            api(libs.wechat.sdk.android)
         }
-        val androidMain by getting {
-            dependencies {
-                api("com.tencent.mm.opensdk:wechat-sdk-android:6.8.24")
-            }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 }
 
 android {
-    namespace = "icu.bughub.kit.multiplatform.wechat"
-    compileSdk = 33
+    namespace = "cn.kmplib.wechat"
+    compileSdk = 35
     defaultConfig {
-        minSdk = 24
+        minSdk = 21
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-afterEvaluate {
-    publishing{
-        publications {
-            create<MavenPublication>("release"){
-                artifactId = "WechatLib"
+
+group = "cn.kmplib"
+version = "0.0.1"
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            groupId = "cn.kmplib"
+            artifactId = "WechatSdk"
+            version = "0.0.3"
+            
+            // 移除 from(components["java"])，因为这是 KMP 项目
+            from(components["kotlin"])
+            
+            pom {
+                name.set("WechatSdk")
+                description.set("Wechat SDK KMP Library")
+                url.set("https://github.com/rainbow7/WechatKMPLib")
             }
         }
     }
