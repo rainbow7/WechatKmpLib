@@ -69,23 +69,17 @@ version = "0.0.1"
 publishing {
     publications {
         create<MavenPublication>("release") {
+            groupId = "cn.kmplib"
             artifactId = "WechatSdk"
-            from(components["release"])  // 添加这行
+            version = "0.0.1"
             
-            // 可选：添加更多 POM 信息
+            // 移除 from(components["java"])，因为这是 KMP 项目
+            from(components["kotlin"])
+            
             pom {
                 name.set("WechatSdk")
                 description.set("Wechat SDK KMP Library")
-                // 如果需要发布到远程仓库，可以添加以下配置
-                // repositories {
-                //     maven {
-                //         url = uri("你的远程仓库地址")
-                //         credentials {
-                //             username = "你的用户名"
-                //             password = "你的密码"
-                //         }
-                //     }
-                // }
+                url.set("https://github.com/rainbow7/WechatKMPLib")
             }
         }
     }
